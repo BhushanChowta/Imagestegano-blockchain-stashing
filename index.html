@@ -1,0 +1,207 @@
+
+
+<!-- This Page is Not used
+Instead Angular frontend Build is used -->
+
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>User Creditional Manager</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: #f2f2f2;
+    }
+
+    h1 {
+      text-align: center;
+      color: #333;
+    }
+
+    .container {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+
+    form {
+        width: 45%;
+        background-color: #ffe1b4;
+        padding: 42px;
+        border-radius: 5px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .retrieve {
+      width: 45%;
+      padding: 20px;
+      background-color: #ffe1b4;
+      margin-left: 5px;
+      border-radius: 5px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    input[type="text"],
+    input[type="password"] {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 10px;
+      border: 1px solid #ccc;
+      border-radius: 3px;
+    }
+
+    input[type="text"]:focus,
+    input[type="password"]:focus {
+      outline: none;
+      border-color: #66afe9;
+      box-shadow: 0 0 5px rgba(102, 175, 233, 0.6);
+    }
+
+    input[type="submit"],
+    button {
+      padding: 10px 20px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    input[type="submit"]:hover,
+    button:hover {
+      background-color: #45a049;
+    }
+
+    #passwordResult {
+      margin-top: 20px;
+      font-weight: bold;
+      color: #333;
+    }
+
+    .retrieveButton {
+      display: block;
+      margin-top: 10px;
+      padding: 8px 16px;
+      background-color: #008CBA;
+      color: white;
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    .retrieveButton:hover {
+      background-color: #00657b;
+    }
+
+    #retrieveInput {
+      width: 95%;
+      padding: 10px;
+      margin-bottom: 10px;
+      border: 1px solid #ccc;
+      border-radius: 3px;
+    }
+    </style>
+</head>
+<body>
+  <h1>User Credential Manager</h1>
+  <div class="container">
+    <form id="saveForm">
+      <h2>Saving Credentials</h2>
+      <label for="webName">Website Name:</label>
+      <input type="text" id="webName" name="webName" placeholder="Enter Website Name" required><br><br>
+      
+      <label for="password">Password:</label>
+      <input type="password" id="password" name="password" placeholder="Enter Website Password" required><br><br>
+      
+      <input type="submit" value="Save Password"><br><br>
+      <div id="saveStatus"></div> <!-- Status display for saving process -->
+    </form>
+
+    
+    <div class="retrieve">
+      <br>
+        <h2>Fetching Credentials</h2>
+        <label for="webName">Website Name:</label>
+        <input type="text" id="retrieveInput" placeholder="Enter Website Name"><br><br>
+        <button id="retrieveButton">Retrieve Password</button><br><br>
+        <div id="retrieveStatus"></div> <!-- Status display for retrieval process -->
+        <div id="passwordResult"></div>
+      <br>
+    </div>
+  </div>
+
+<script>
+  const saveForm = document.getElementById('saveForm');
+  const saveStatus = document.getElementById('saveStatus'); // Reference to the save status element
+  const retrieveButton = document.getElementById('retrieveButton');
+  const retrieveStatus = document.getElementById('retrieveStatus'); // Reference to the retrieve status element
+  const passwordResult = document.getElementById('passwordResult');
+
+  saveForm.addEventListener('submit', function (event) {
+    event.preventDefault(); // Prevent form submission
+
+    const webName = document.getElementById('webName').value;
+    const password = document.getElementById('password').value;
+
+    // Display saving status message
+    saveStatus.textContent = 'Saving credentials...';
+
+    // Make a POST request to save the password
+    fetch('/save', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        webName: webName,
+        password: password
+      })
+    })
+    .then(response => response.json())
+    .then(data => {
+      console.log('Save Response:', data);
+      // Display success message or perform any other actions
+      saveStatus.textContent = 'Credentials saved successfully!';
+    })
+    .catch(error => {
+      console.error('Save Error:', error);
+      // Display error message or perform any other actions
+      saveStatus.textContent = 'An error occurred while saving credentials.';
+    });
+  });
+
+  retrieveButton.addEventListener('click', function () {
+    const webName = document.getElementById('retrieveInput').value;
+
+    // Display retrieval status message
+    retrieveStatus.textContent = 'Retrieving credentials...';
+
+    // Make a GET request to retrieve the password
+    fetch(`/getPassword?webName=${encodeURIComponent(webName)}`)
+      .then(response => response.json())
+      .then(data => {
+        console.log('Retrieve Response:', data);
+        if (data.Password) {
+          passwordResult.textContent = `Password: ${data.Password}`;
+        } else {
+          passwordResult.textContent = 'No password found for the website';
+        }
+        // Clear retrieval status message
+        retrieveStatus.textContent = '';
+      })
+      .catch(error => {
+        console.error('Retrieve Error:', error);
+        // Display error message or perform any other actions
+        retrieveStatus.textContent = 'An error occurred while retrieving credentials.';
+        // Clear retrieval status message
+        retrieveStatus.textContent = '';
+        });
+      });
+  </script>
+</body>
+</html>
